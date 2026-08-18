@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface MapSimulationProps {
   isSimulating: boolean;
   addEvent: (text: string, type: 'info' | 'alert' | 'success') => void;
+  onSignalOverride: () => void;
+  onComplete: () => void;
 }
 
 // Fixed route coordinates matching the grid nodes
@@ -24,7 +26,7 @@ const generateCivilianRoutes = () => [
    { start: {x: 40, y: 40}, end: {x: 20, y: 40}, duration: 10 }
 ];
 
-export default function MapSimulation({ isSimulating, addEvent }: MapSimulationProps) {
+export default function MapSimulation({ isSimulating, addEvent, onSignalOverride, onComplete }: MapSimulationProps) {
   // We manage the ambulance current node index based on simulation progress
   const [currentNodeIndex, setCurrentNodeIndex] = useState(0);
   const totalNodes = ROUTE_NODES.length;
@@ -41,17 +43,22 @@ export default function MapSimulation({ isSimulating, addEvent }: MapSimulationP
         if (prev < totalNodes - 1) {
           const nextNode = ROUTE_NODES[prev + 1];
           addEvent(`✅ Signal at ${nextNode.x},${nextNode.y} overridden to GREEN`, "success");
+          onSignalOverride();
           return prev + 1;
-        } else {
-          addEvent(`🚑 Ambulance reached destination. Corridor closing.`, "info");
-          clearInterval(interval);
-          return prev;
         }
+        return prev;
       });
     }, 4000);
 
     return () => clearInterval(interval);
-  }, [isSimulating, totalNodes, addEvent]);
+  }, [isSimulating, totalNodes, addEvent, onSignalOverride]);
+
+  useEffect(() => {
+    if (isSimulating && currentNodeIndex === totalNodes - 1) {
+      addEvent(`🚑 Ambulance reached destination. Corridor closing.`, "info");
+      onComplete();
+    }
+  }, [isSimulating, currentNodeIndex, totalNodes, addEvent, onComplete]);
 
   // Determine signal color for a grid node
   const getSignalColor = (nodeX: number, nodeY: number) => {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Bell, ShieldAlert, LayoutDashboard, LineChart, Network, Video } from 'lucide-react';
 import MapSimulation from './MapSimulation';
 import Sidebar from './Sidebar';
@@ -7,6 +7,7 @@ import Controls from './Controls';
 import DetectionFeed from './DetectionFeed';
 import Analytics from './Analytics';
 import Architecture from './Architecture';
+import { type SimulationRun } from '../lib/analytics';
 
 type Tab = 'dashboard' | 'analytics' | 'architecture' | 'cameras';
 
@@ -15,39 +16,97 @@ export default function Dashboard() {
   const [isSimulating, setIsSimulating] = useState(false);
   const [simulationTime, setSimulationTime] = useState(0);
   const [events, setEvents] = useState<{ id: number; text: string; time: string; type: 'info' | 'alert' | 'success' }[]>([]);
+  const [simulationRuns, setSimulationRuns] = useState<SimulationRun[]>([]);
+  const activeRunRef = useRef<SimulationRun | null>(null);
+  const simulationTimeRef = useRef(0);
+  const signalCountRef = useRef(0);
 
   // Simulation time loop
   useEffect(() => {
-    let interval: ReturnType<typeof setInterval>;
-    if (isSimulating) {
-      interval = setInterval(() => {
-        setSimulationTime(prev => prev + 1);
-      }, 1000);
-    }
+    if (!isSimulating) return;
+
+    const interval = setInterval(() => {
+      setSimulationTime(prev => {
+        const nextTime = prev + 1;
+        simulationTimeRef.current = nextTime;
+        return nextTime;
+      });
+    }, 1000);
+
     return () => clearInterval(interval);
   }, [isSimulating]);
 
-  const addEvent = (text: string, type: 'info' | 'alert' | 'success') => {
+  const addEvent = useCallback((text: string, type: 'info' | 'alert' | 'success') => {
     setEvents(prev => [{
       id: Date.now(),
       text,
       type,
       time: new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })
     }, ...prev].slice(0, 50));
-  };
+  }, []);
 
-  const startSimulation = () => {
+  const startSimulation = useCallback(() => {
+    const startedAt = Date.now();
+    simulationTimeRef.current = 0;
+    signalCountRef.current = 0;
+    activeRunRef.current = {
+      id: `run-${startedAt}`,
+      vehicleType: 'Type-1 Ambulance',
+      origin: 'AIIMS, New Delhi',
+      destination: 'Safdarjung Hospital',
+      startedAt,
+      completedAt: 0,
+      elapsedSeconds: 0,
+      signalsOverridden: 0,
+      status: 'completed',
+    };
+    setSimulationTime(0);
     setIsSimulating(true);
     addEvent("🚨 Emergency vehicle detected at AIIMS", "alert");
     setTimeout(() => addEvent("📡 Route calculated: AIIMS → Safdarjung Hospital", "info"), 1000);
     setTimeout(() => addEvent("🔔 Driver alert sent to 14 nearby vehicles", "info"), 2000);
-  };
+  }, [addEvent]);
 
-  const resetSimulation = () => {
+  const handleSignalOverride = useCallback(() => {
+    signalCountRef.current += 1;
+  }, []);
+
+  const handleSimulationComplete = useCallback(() => {
+    const activeRun = activeRunRef.current;
+    if (!activeRun) return;
+
+    const completedAt = Date.now();
+    setSimulationRuns(prev => [...prev, {
+      ...activeRun,
+      completedAt,
+      elapsedSeconds: simulationTimeRef.current,
+      signalsOverridden: signalCountRef.current,
+      status: 'completed',
+    }]);
+    activeRunRef.current = null;
+    setIsSimulating(false);
+  }, []);
+
+  const resetSimulation = useCallback(() => {
+    const activeRun = activeRunRef.current;
+    if (activeRun) {
+      const cancelledAt = Date.now();
+      setSimulationRuns(prev => [...prev, {
+        ...activeRun,
+        completedAt: cancelledAt,
+        elapsedSeconds: simulationTimeRef.current,
+        signalsOverridden: signalCountRef.current,
+        status: 'cancelled',
+      }]);
+    }
+
+    activeRunRef.current = null;
+    simulationTimeRef.current = 0;
+    signalCountRef.current = 0;
     setIsSimulating(false);
     setSimulationTime(0);
     setEvents([]);
-  };
+  }, []);
 
   return (
     <div className="flex flex-col h-screen w-full bg-brand-navy">
@@ -129,16 +188,18 @@ export default function Dashboard() {
                 <div className="flex-1 relative p-4">
                   <div className="absolute inset-4 border border-white/10 rounded-xl overflow-hidden bg-black/40">
                     <MapSimulation 
-                      isSimulating={isSimulating} 
-                      addEvent={addEvent} 
+                      isSimulating={isSimulating}
+                      addEvent={addEvent}
+                      onSignalOverride={handleSignalOverride}
+                      onComplete={handleSimulationComplete}
                     />
                   </div>
                 </div>
                 <div className="h-64 border-t border-white/10 bg-brand-navy/60 p-4">
-                  <Controls 
-                    onStart={startSimulation} 
-                    onReset={resetSimulation} 
-                    isSimulating={isSimulating} 
+                  <Controls
+                    onStart={startSimulation}
+                    onReset={resetSimulation}
+                    isSimulating={isSimulating}
                   />
                 </div>
               </div>
@@ -158,7 +219,7 @@ export default function Dashboard() {
 
           {activeTab === 'analytics' && (
             <div className="w-full p-8 overflow-y-auto">
-              <Analytics />
+              <Analytics runs={simulationRuns} />
             </div>
           )}
 
