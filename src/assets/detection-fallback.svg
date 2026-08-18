@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 9" role="img" aria-labelledby="title desc">
+  <title id="title">Simulated traffic camera fallback</title>
+  <desc id="desc">A dark grid representing an unavailable simulated camera feed.</desc>
+  <rect width="16" height="9" fill="#111624"/>
+  <path d="M0 2.25h16M0 4.5h16M0 6.75h16M4 0v9M8 0v9M12 0v9" stroke="#26344a" stroke-width=".08"/>
+  <circle cx="8" cy="4.5" r="1.4" fill="#00ff88" fill-opacity=".12" stroke="#00ff88" stroke-width=".08"/>
+  <path d="M6.8 4.5h2.4M8 3.3v2.4" stroke="#00ff88" stroke-width=".08"/>
+</svg>

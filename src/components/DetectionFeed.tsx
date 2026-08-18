@@ -1,5 +1,5 @@
 import { AlertTriangle, Car, Crosshair, Radar, Users } from 'lucide-react';
-import heroFallback from '../assets/hero.png';
+import detectionFallback from '../assets/detection-fallback.svg';
 
 interface DetectionFeedProps {
   isSimulating: boolean;
@@ -16,7 +16,7 @@ function CameraBackground({ className = '' }: { className?: string }) {
       className={`absolute inset-0 h-full w-full object-cover bg-gray-900 opacity-50 mix-blend-luminosity grayscale ${className}`}
       onError={(event) => {
         event.currentTarget.onerror = null;
-        event.currentTarget.src = heroFallback;
+        event.currentTarget.src = detectionFallback;
       }}
     />
   );
