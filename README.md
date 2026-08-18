@@ -14,3 +14,13 @@ An AI-powered traffic management system that automatically creates a green corri
 npm install --legacy-peer-deps
 npm run dev
 ```
+
+### Remote preview hosts
+
+The development server binds to available interfaces for hosted previews. For a non-local hostname, provide a comma-separated allowlist through `VITE_ALLOWED_HOSTS` before starting Vite:
+
+```bash
+VITE_ALLOWED_HOSTS=preview.example.com npm run dev
+```
+
+Leave `VITE_ALLOWED_HOSTS` unset for local development. The configuration does not enable unrestricted host allowlisting by default.
