@@ -1,6 +1,6 @@
 ## Issue
 
-Fixes #<!-- issue number -->
+Fixes #123 <!-- replace 123 with the issue number -->
 
 ## Summary
 
