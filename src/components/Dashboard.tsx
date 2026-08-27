@@ -81,11 +81,12 @@ export default function Dashboard() {
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">
         {/* Navigation Sidebar (Thin) */}
-        <nav className="w-16 border-r border-white/10 flex flex-col items-center py-6 gap-6 bg-brand-navy/50">
+        <nav role="tablist" aria-label="Dashboard sections" className="w-16 border-r border-white/10 flex flex-col items-center py-6 gap-6 bg-brand-navy/50">
           <button
             type="button"
             aria-label="Dashboard"
-            aria-pressed={activeTab === 'dashboard'}
+            role="tab"
+            aria-selected={activeTab === 'dashboard'}
             onClick={() => setActiveTab('dashboard')} 
             className={`p-3 rounded-xl transition-all ${activeTab === 'dashboard' ? 'bg-brand-green/20 text-brand-green glow-border' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
             title="Dashboard"
@@ -95,7 +96,8 @@ export default function Dashboard() {
           <button
             type="button"
             aria-label="AI Detection Feeds"
-            aria-pressed={activeTab === 'cameras'}
+            role="tab"
+            aria-selected={activeTab === 'cameras'}
             onClick={() => setActiveTab('cameras')} 
             className={`p-3 rounded-xl transition-all ${activeTab === 'cameras' ? 'bg-brand-green/20 text-brand-green glow-border' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
             title="AI Detection Feeds"
@@ -105,7 +107,8 @@ export default function Dashboard() {
           <button
             type="button"
             aria-label="Analytics"
-            aria-pressed={activeTab === 'analytics'}
+            role="tab"
+            aria-selected={activeTab === 'analytics'}
             onClick={() => setActiveTab('analytics')} 
             className={`p-3 rounded-xl transition-all ${activeTab === 'analytics' ? 'bg-brand-green/20 text-brand-green glow-border' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
             title="Analytics"
@@ -115,7 +118,8 @@ export default function Dashboard() {
           <button
             type="button"
             aria-label="System Architecture"
-            aria-pressed={activeTab === 'architecture'}
+            role="tab"
+            aria-selected={activeTab === 'architecture'}
             onClick={() => setActiveTab('architecture')} 
             className={`p-3 rounded-xl transition-all ${activeTab === 'architecture' ? 'bg-brand-green/20 text-brand-green glow-border' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
             title="System Architecture"
