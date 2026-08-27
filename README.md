@@ -14,3 +14,14 @@ An AI-powered traffic management system that automatically creates a green corri
 npm install --legacy-peer-deps
 npm run dev
 ```
+
+
+## Quality checks
+
+Run the following command before submitting a pull request:
+
+```bash
+npm run quality
+```
+
+This command runs the production build followed by ESLint. The current upstream `main` branch has known lint failures addressed by upstream Pull Request #1; the command is expected to pass after that fix is integrated.
