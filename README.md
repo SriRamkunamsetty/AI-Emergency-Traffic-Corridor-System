@@ -1,13 +1,13 @@
 # AI-Emergency-Traffic-Corridor-System
 
-An AI-powered traffic management system that automatically creates a green corridor for emergency vehicles such as ambulances and fire trucks. The system uses computer vision and AI-based traffic analysis to detect emergency vehicles, optimize routes, and dynamically control traffic signals to reduce response time during emergencies.
+A frontend prototype that demonstrates how an AI-assisted traffic management system could create a green corridor for emergency vehicles such as ambulances and fire trucks. The current repository provides a scripted city simulation, simulated detection overlays, and run-based frontend analytics; live computer vision, route optimization, and traffic-controller integrations are planned extensions.
 
 
 ## Features
-- **Live City Simulation:** Visual map rendering traffic nodes, cars, and ambulance movement.
-- **Smart Signaling:** Intersections turn green ahead of the emergency vehicle.
-- **AI Detection Feeds:** Simulated YOLOv8 CCTV camera object detection for ambulances vs regular traffic.
-- **Real-Time Analytics Dashboard:** Performance metrics comparing response times with/without the system.
+- **Frontend City Simulation:** Visual map rendering traffic nodes, civilian vehicles, and emergency-vehicle movement.
+- **Simulated Smart Signaling:** Demonstrates intersections turning green ahead of the emergency vehicle.
+- **Simulated Detection Feeds:** Demonstrates YOLO-style CCTV bounding boxes without live camera or inference integration.
+- **Run-Based Analytics Dashboard:** Displays metrics derived from completed frontend simulation runs.
 
 ## Setup
 ```bash
