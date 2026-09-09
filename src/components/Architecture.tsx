@@ -18,9 +18,9 @@ export default function Architecture() {
   return (
     <div className="w-full max-w-5xl mx-auto flex flex-col items-center">
       <div className="text-center mb-12">
-        <h2 className="text-3xl font-sans font-bold tracking-wide text-white mb-3">System Architecture & Data Flow</h2>
+        <h2 className="text-3xl font-sans font-bold tracking-wide text-white mb-3">Prototype Architecture & Data Flow</h2>
         <p className="text-gray-400 font-mono text-sm max-w-2xl mx-auto">
-          Real-time integration between edge-computing vision nodes, cloud-based route optimization, and municipal traffic controllers.
+          Current frontend demonstration flow with clearly marked integration points for future vision, routing, and traffic-controller services.
         </p>
       </div>
 
@@ -38,8 +38,8 @@ export default function Architecture() {
               <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-blue-400 animate-pulse"></div>
             </div>
             <div className="text-center">
-              <div className="font-bold text-white tracking-wide">CCTV Feeds</div>
-              <div className="text-xs font-mono text-blue-400">Edge Capture</div>
+              <div className="font-bold text-white tracking-wide">Simulated Camera Panels</div>
+              <div className="text-xs font-mono text-blue-400">Frontend Demo Input</div>
             </div>
           </div>
 
@@ -51,8 +51,8 @@ export default function Architecture() {
               <div className="absolute inset-0 bg-blue-400/5 rounded-2xl animate-pulse"></div>
             </div>
             <div className="text-center">
-              <div className="font-bold text-white tracking-wide">YOLOv8 Vision</div>
-              <div className="text-xs font-mono text-blue-400">Object Detection</div>
+              <div className="font-bold text-white tracking-wide">Detection Overlay Demo</div>
+              <div className="text-xs font-mono text-blue-400">Simulated Output</div>
             </div>
           </div>
         </motion.div>
@@ -78,8 +78,8 @@ export default function Architecture() {
                 <Server className="w-8 h-8 text-brand-green" />
               </div>
               <div className="text-center">
-                <div className="font-bold text-white text-sm">Path Optimizer</div>
-                <div className="text-[10px] font-mono text-brand-green">A* Algorithm (Live)</div>
+                <div className="font-bold text-white text-sm">Fixed Route Config</div>
+                <div className="text-[10px] font-mono text-brand-green">Scripted Demo Path</div>
               </div>
             </div>
 
@@ -90,8 +90,8 @@ export default function Architecture() {
                 <Route className="w-8 h-8 text-brand-green" />
               </div>
               <div className="text-center">
-                <div className="font-bold text-white text-sm">Target Route</div>
-                <div className="text-[10px] font-mono text-brand-green">Nodes Assessed</div>
+                <div className="font-bold text-white text-sm">Route Visualization</div>
+                <div className="text-[10px] font-mono text-brand-green">Configured Demo Nodes</div>
               </div>
             </div>
           </div>
@@ -113,8 +113,8 @@ export default function Architecture() {
             <div className="absolute inset-0 bg-brand-green/5 group-hover:bg-brand-green/10 transition-colors"></div>
             <ShieldCheck className="w-12 h-12 text-brand-green relative z-10" />
             <div className="text-center relative z-10">
-              <div className="font-bold text-white">Signal Controller</div>
-              <div className="text-xs font-mono text-brand-green mt-1">Preempt IoT Relays</div>
+              <div className="font-bold text-white">Signal Preemption Demo</div>
+              <div className="text-xs font-mono text-brand-green mt-1">No hardware connection</div>
               <p className="text-[10px] text-gray-400 mt-2 leading-tight">Clears path by forcing green lights ahead of the emergency vehicle.</p>
             </div>
           </div>
@@ -123,9 +123,9 @@ export default function Architecture() {
             <div className="absolute inset-0 bg-brand-amber/5 group-hover:bg-brand-amber/10 transition-colors"></div>
             <Smartphone className="w-12 h-12 text-brand-amber relative z-10" />
             <div className="text-center relative z-10">
-              <div className="font-bold text-white">Driver Alert System</div>
-              <div className="text-xs font-mono text-brand-amber mt-1">Push Notifications</div>
-              <p className="text-[10px] text-gray-400 mt-2 leading-tight">Notifies civilian drivers on the route via maps integration to pull over.</p>
+              <div className="font-bold text-white">Driver Alert Demo</div>
+              <div className="text-xs font-mono text-brand-amber mt-1">No push service connected</div>
+              <p className="text-[10px] text-gray-400 mt-2 leading-tight">Represents a future notification integration; this prototype does not send live driver alerts.</p>
             </div>
           </div>
         </motion.div>
