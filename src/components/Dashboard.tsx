@@ -81,29 +81,45 @@ export default function Dashboard() {
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">
         {/* Navigation Sidebar (Thin) */}
-        <nav className="w-16 border-r border-white/10 flex flex-col items-center py-6 gap-6 bg-brand-navy/50">
-          <button 
+        <nav role="tablist" aria-label="Dashboard sections" className="w-16 border-r border-white/10 flex flex-col items-center py-6 gap-6 bg-brand-navy/50">
+          <button
+            type="button"
+            aria-label="Dashboard"
+            role="tab"
+            aria-selected={activeTab === 'dashboard'}
             onClick={() => setActiveTab('dashboard')} 
             className={`p-3 rounded-xl transition-all ${activeTab === 'dashboard' ? 'bg-brand-green/20 text-brand-green glow-border' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
             title="Dashboard"
           >
             <LayoutDashboard className="w-6 h-6" />
           </button>
-          <button 
+          <button
+            type="button"
+            aria-label="AI Detection Feeds"
+            role="tab"
+            aria-selected={activeTab === 'cameras'}
             onClick={() => setActiveTab('cameras')} 
             className={`p-3 rounded-xl transition-all ${activeTab === 'cameras' ? 'bg-brand-green/20 text-brand-green glow-border' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
             title="AI Detection Feeds"
           >
             <Video className="w-6 h-6" />
           </button>
-          <button 
+          <button
+            type="button"
+            aria-label="Analytics"
+            role="tab"
+            aria-selected={activeTab === 'analytics'}
             onClick={() => setActiveTab('analytics')} 
             className={`p-3 rounded-xl transition-all ${activeTab === 'analytics' ? 'bg-brand-green/20 text-brand-green glow-border' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
             title="Analytics"
           >
             <LineChart className="w-6 h-6" />
           </button>
-          <button 
+          <button
+            type="button"
+            aria-label="System Architecture"
+            role="tab"
+            aria-selected={activeTab === 'architecture'}
             onClick={() => setActiveTab('architecture')} 
             className={`p-3 rounded-xl transition-all ${activeTab === 'architecture' ? 'bg-brand-green/20 text-brand-green glow-border' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
             title="System Architecture"

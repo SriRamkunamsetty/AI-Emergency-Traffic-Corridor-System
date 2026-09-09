@@ -42,18 +42,18 @@ export default function Controls({ onStart, onReset, isSimulating }: ControlsPro
         {/* Action Controls */}
         <div className="bg-black/30 rounded-lg p-4 border border-white/10 flex flex-col justify-between">
           <div className="flex flex-col gap-4">
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-gray-400">Vehicle Class:</span>
-              <select className="bg-brand-navy border border-white/20 rounded p-1.5 focus:outline-none focus:border-brand-green text-white">
+              <div className="flex justify-between items-center text-sm">
+              <label htmlFor="vehicle-class" className="text-gray-400">Vehicle Class:</label>
+              <select id="vehicle-class" aria-label="Vehicle class" className="bg-brand-navy border border-white/20 rounded p-1.5 focus:outline-none focus:border-brand-green text-white">
                 <option>Type-1 Ambulance</option>
                 <option>Fire Engine</option>
                 <option>Police Pursuit</option>
               </select>
             </div>
             
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-gray-400">Civilian Traffic:</span>
-              <select className="bg-brand-navy border border-white/20 rounded p-1.5 focus:outline-none focus:border-brand-green text-white">
+              <div className="flex justify-between items-center text-sm">
+              <label htmlFor="civilian-traffic" className="text-gray-400">Civilian Traffic:</label>
+              <select id="civilian-traffic" aria-label="Civilian traffic density" className="bg-brand-navy border border-white/20 rounded p-1.5 focus:outline-none focus:border-brand-green text-white">
                 <option>High (Rush Hour)</option>
                 <option>Medium</option>
                 <option>Low (Night)</option>
@@ -63,7 +63,9 @@ export default function Controls({ onStart, onReset, isSimulating }: ControlsPro
 
           <div className="flex gap-4 mt-4">
             {!isSimulating ? (
-              <button 
+              <button
+                type="button"
+                aria-label="Trigger emergency simulation"
                 onClick={onStart}
                 className="flex-1 bg-brand-green text-brand-navy font-bold py-3 rounded hover:bg-brand-green/90 transition-all flex items-center justify-center gap-2 glow-border shadow-[0_0_20px_rgba(0,255,136,0.2)]"
               >
@@ -71,7 +73,9 @@ export default function Controls({ onStart, onReset, isSimulating }: ControlsPro
                 TRIGGER EMERGENCY
               </button>
             ) : (
-              <button 
+              <button
+                type="button"
+                aria-label="Reset simulation"
                 onClick={onReset}
                 className="flex-1 bg-brand-red text-white font-bold py-3 rounded hover:bg-brand-red/90 transition-all flex items-center justify-center gap-2 glow-border-red shadow-[0_0_20px_rgba(255,59,59,0.2)]"
               >
