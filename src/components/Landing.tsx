@@ -133,8 +133,8 @@ export default function Landing({ onLaunch }: LandingProps) {
 
       {/* Footer / Watermark */}
       <div className="absolute bottom-4 right-6 text-xs text-white/30 font-mono text-right z-20 pointer-events-none">
-        Built for Graph-e-thon 3.0 | Track: SDG-11<br/>
-        <span className="text-brand-green/70">techie_doonites</span> | Graphic Era Hill University
+        AI Emergency Traffic Corridor System • Open-source prototype<br/>
+        <span className="text-brand-green/70">Community-built emergency response research demo</span>
       </div>
     </div>
   );
