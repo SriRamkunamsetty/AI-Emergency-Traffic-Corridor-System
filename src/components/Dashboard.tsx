@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Bell, ShieldAlert, LayoutDashboard, LineChart, Network, Video } from 'lucide-react';
 import MapSimulation from './MapSimulation';
 import Sidebar from './Sidebar';
@@ -7,6 +7,7 @@ import Controls from './Controls';
 import DetectionFeed from './DetectionFeed';
 import Analytics from './Analytics';
 import Architecture from './Architecture';
+import type { SimulationRun } from '../lib/analytics';
 
 type Tab = 'dashboard' | 'analytics' | 'architecture' | 'cameras';
 
@@ -14,40 +15,99 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
   const [isSimulating, setIsSimulating] = useState(false);
   const [simulationTime, setSimulationTime] = useState(0);
+  const [simulationRuns, setSimulationRuns] = useState<SimulationRun[]>([]);
   const [events, setEvents] = useState<{ id: number; text: string; time: string; type: 'info' | 'alert' | 'success' }[]>([]);
+
+  const activeRunRef = useRef<SimulationRun | null>(null);
+  const simulationTimeRef = useRef(0);
+  const signalCountRef = useRef(0);
 
   // Simulation time loop
   useEffect(() => {
-    let interval: ReturnType<typeof setInterval>;
-    if (isSimulating) {
-      interval = setInterval(() => {
-        setSimulationTime(prev => prev + 1);
-      }, 1000);
-    }
+    if (!isSimulating) return;
+
+    const interval = setInterval(() => {
+      setSimulationTime(prev => {
+        const nextTime = prev + 1;
+        simulationTimeRef.current = nextTime;
+        return nextTime;
+      });
+    }, 1000);
+
     return () => clearInterval(interval);
   }, [isSimulating]);
 
-  const addEvent = (text: string, type: 'info' | 'alert' | 'success') => {
+  const addEvent = useCallback((text: string, type: 'info' | 'alert' | 'success') => {
     setEvents(prev => [{
       id: Date.now(),
       text,
       type,
       time: new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })
     }, ...prev].slice(0, 50));
-  };
+  }, []);
 
-  const startSimulation = () => {
+  const startSimulation = useCallback((vehicleType: string = 'Type-1 Ambulance') => {
+    const startedAt = Date.now();
+    simulationTimeRef.current = 0;
+    signalCountRef.current = 0;
+    activeRunRef.current = {
+      id: `run-${startedAt}`,
+      vehicleType,
+      origin: 'AIIMS, New Delhi',
+      destination: 'Safdarjung Hospital',
+      startedAt,
+      completedAt: 0,
+      elapsedSeconds: 0,
+      signalsOverridden: 0,
+      status: 'completed',
+    };
+    setSimulationTime(0);
     setIsSimulating(true);
-    addEvent("🚨 Emergency vehicle detected at AIIMS", "alert");
+    addEvent(`🚨 Emergency vehicle detected (${vehicleType}) at AIIMS`, "alert");
     setTimeout(() => addEvent("📡 Route calculated: AIIMS → Safdarjung Hospital", "info"), 1000);
     setTimeout(() => addEvent("🔔 Driver alert sent to 14 nearby vehicles", "info"), 2000);
-  };
+  }, [addEvent]);
 
-  const resetSimulation = () => {
+  const handleSignalOverride = useCallback(() => {
+    signalCountRef.current += 1;
+  }, []);
+
+  const handleSimulationComplete = useCallback(() => {
+    const activeRun = activeRunRef.current;
+    if (!activeRun) return;
+
+    const completedAt = Date.now();
+    setSimulationRuns(prev => [...prev, {
+      ...activeRun,
+      completedAt,
+      elapsedSeconds: simulationTimeRef.current,
+      signalsOverridden: signalCountRef.current,
+      status: 'completed',
+    }]);
+    activeRunRef.current = null;
+    setIsSimulating(false);
+  }, []);
+
+  const resetSimulation = useCallback(() => {
+    const activeRun = activeRunRef.current;
+    if (activeRun) {
+      const cancelledAt = Date.now();
+      setSimulationRuns(prev => [...prev, {
+        ...activeRun,
+        completedAt: cancelledAt,
+        elapsedSeconds: simulationTimeRef.current,
+        signalsOverridden: signalCountRef.current,
+        status: 'cancelled',
+      }]);
+    }
+
+    activeRunRef.current = null;
+    simulationTimeRef.current = 0;
+    signalCountRef.current = 0;
     setIsSimulating(false);
     setSimulationTime(0);
     setEvents([]);
-  };
+  }, []);
 
   return (
     <div className="flex flex-col h-screen w-full bg-brand-navy">
@@ -71,7 +131,7 @@ export default function Dashboard() {
           <div className="font-mono text-sm border font-bold border-white/20 px-3 py-1 rounded bg-black/30">
             {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </div>
-          <button className="relative p-2 text-gray-400 hover:text-white transition-colors">
+          <button type="button" aria-label="Notifications" className="relative p-2 text-gray-400 hover:text-white transition-colors cursor-pointer">
             <Bell className="w-5 h-5" />
             <span className="absolute top-1 right-1 w-2 h-2 bg-brand-amber rounded-full"></span>
           </button>
@@ -81,31 +141,47 @@ export default function Dashboard() {
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">
         {/* Navigation Sidebar (Thin) */}
-        <nav className="w-16 border-r border-white/10 flex flex-col items-center py-6 gap-6 bg-brand-navy/50">
+        <nav role="tablist" aria-label="Dashboard sections" className="w-16 border-r border-white/10 flex flex-col items-center py-6 gap-6 bg-brand-navy/50">
           <button 
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'dashboard'}
+            aria-label="Dashboard"
             onClick={() => setActiveTab('dashboard')} 
-            className={`p-3 rounded-xl transition-all ${activeTab === 'dashboard' ? 'bg-brand-green/20 text-brand-green glow-border' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
+            className={`p-3 rounded-xl transition-all cursor-pointer ${activeTab === 'dashboard' ? 'bg-brand-green/20 text-brand-green glow-border' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
             title="Dashboard"
           >
             <LayoutDashboard className="w-6 h-6" />
           </button>
           <button 
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'cameras'}
+            aria-label="AI Detection Feeds"
             onClick={() => setActiveTab('cameras')} 
-            className={`p-3 rounded-xl transition-all ${activeTab === 'cameras' ? 'bg-brand-green/20 text-brand-green glow-border' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
+            className={`p-3 rounded-xl transition-all cursor-pointer ${activeTab === 'cameras' ? 'bg-brand-green/20 text-brand-green glow-border' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
             title="AI Detection Feeds"
           >
             <Video className="w-6 h-6" />
           </button>
           <button 
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'analytics'}
+            aria-label="Analytics"
             onClick={() => setActiveTab('analytics')} 
-            className={`p-3 rounded-xl transition-all ${activeTab === 'analytics' ? 'bg-brand-green/20 text-brand-green glow-border' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
+            className={`p-3 rounded-xl transition-all cursor-pointer ${activeTab === 'analytics' ? 'bg-brand-green/20 text-brand-green glow-border' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
             title="Analytics"
           >
             <LineChart className="w-6 h-6" />
           </button>
           <button 
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'architecture'}
+            aria-label="System Architecture"
             onClick={() => setActiveTab('architecture')} 
-            className={`p-3 rounded-xl transition-all ${activeTab === 'architecture' ? 'bg-brand-green/20 text-brand-green glow-border' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
+            className={`p-3 rounded-xl transition-all cursor-pointer ${activeTab === 'architecture' ? 'bg-brand-green/20 text-brand-green glow-border' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
             title="System Architecture"
           >
             <Network className="w-6 h-6" />
@@ -131,6 +207,8 @@ export default function Dashboard() {
                     <MapSimulation 
                       isSimulating={isSimulating} 
                       addEvent={addEvent} 
+                      onSignalOverride={handleSignalOverride}
+                      onComplete={handleSimulationComplete}
                     />
                   </div>
                 </div>
@@ -158,7 +236,7 @@ export default function Dashboard() {
 
           {activeTab === 'analytics' && (
             <div className="w-full p-8 overflow-y-auto">
-              <Analytics />
+              <Analytics runs={simulationRuns} />
             </div>
           )}
 
