@@ -1,20 +1,13 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { DEMO_ROUTE, ROUTE_NODES } from '../lib/routeConfig';
 
 interface MapSimulationProps {
   isSimulating: boolean;
   addEvent: (text: string, type: 'info' | 'alert' | 'success') => void;
+  onSignalOverride?: () => void;
+  onComplete?: () => void;
 }
-
-// Fixed route coordinates matching the grid nodes
-const ROUTE_NODES = [
-  { id: '1,4', x: 20, y: 80, name: 'AIIMS' }, // Start
-  { id: '2,4', x: 40, y: 80 },
-  { id: '2,3', x: 40, y: 60 },
-  { id: '3,3', x: 60, y: 60 },
-  { id: '3,2', x: 60, y: 40 },
-  { id: '4,2', x: 80, y: 40, name: 'Safdarjung' } // End
-];
 
 // Generates civilian traffic not interfering with the route
 const generateCivilianRoutes = () => [
@@ -24,34 +17,43 @@ const generateCivilianRoutes = () => [
    { start: {x: 40, y: 40}, end: {x: 20, y: 40}, duration: 10 }
 ];
 
-export default function MapSimulation({ isSimulating, addEvent }: MapSimulationProps) {
-  // We manage the ambulance current node index based on simulation progress
+export default function MapSimulation({ isSimulating, addEvent, onSignalOverride, onComplete }: MapSimulationProps) {
   const [currentNodeIndex, setCurrentNodeIndex] = useState(0);
+  const [prevIsSimulating, setPrevIsSimulating] = useState(isSimulating);
   const totalNodes = ROUTE_NODES.length;
 
-  useEffect(() => {
+  if (prevIsSimulating !== isSimulating) {
+    setPrevIsSimulating(isSimulating);
     if (!isSimulating) {
       setCurrentNodeIndex(0);
-      return;
     }
+  }
 
-    // Move ambulance every 3 seconds
+  useEffect(() => {
+    if (!isSimulating) return;
+
+    // Move ambulance every 4 seconds
     const interval = setInterval(() => {
       setCurrentNodeIndex(prev => {
         if (prev < totalNodes - 1) {
           const nextNode = ROUTE_NODES[prev + 1];
           addEvent(`✅ Signal at ${nextNode.x},${nextNode.y} overridden to GREEN`, "success");
+          onSignalOverride?.();
           return prev + 1;
-        } else {
-          addEvent(`🚑 Ambulance reached destination. Corridor closing.`, "info");
-          clearInterval(interval);
-          return prev;
         }
+        return prev;
       });
     }, 4000);
 
     return () => clearInterval(interval);
-  }, [isSimulating, totalNodes, addEvent]);
+  }, [isSimulating, totalNodes, addEvent, onSignalOverride]);
+
+  useEffect(() => {
+    if (isSimulating && currentNodeIndex === totalNodes - 1) {
+      addEvent(`🚑 Ambulance reached destination. Corridor closing.`, "info");
+      onComplete?.();
+    }
+  }, [isSimulating, currentNodeIndex, totalNodes, addEvent, onComplete]);
 
   // Determine signal color for a grid node
   const getSignalColor = (nodeX: number, nodeY: number) => {
@@ -186,6 +188,10 @@ export default function MapSimulation({ isSimulating, addEvent }: MapSimulationP
       {/* HUD Layer overlay */}
       <div className="absolute top-4 left-4 font-mono text-xs text-brand-green bg-brand-navy/80 px-3 py-1 rounded border border-brand-green/30 backdrop-blur-sm">
         CAM_VIEW: OVERHEAD_SAT
+      </div>
+      <div className="absolute top-4 right-4 max-w-[230px] font-mono text-[10px] text-gray-300 bg-brand-navy/90 px-3 py-2 rounded border border-white/10 backdrop-blur-sm" title={DEMO_ROUTE.description}>
+        ROUTE MODE: FIXED DEMO
+        <div className="text-gray-500 mt-1">{DEMO_ROUTE.name} • no live optimization</div>
       </div>
       <div className="absolute bottom-4 right-4 font-mono text-[10px] text-gray-500">
         LAT: 28.56708, LNG: 77.21004
